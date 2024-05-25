@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PictureController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 $idRegex = '[0-9]+';
 $slugRegex = '[0-9a-z\-]+';
 
@@ -32,9 +33,10 @@ Route::post('/biens/{property}/contact', [\App\Http\Controllers\PropertyControll
 ]);
 
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
-    
-   Route::resource('property', \App\Http\Controllers\Admin\PropertyController::class )->except(['show']);
-   Route::resource('option', \App\Http\Controllers\Admin\OptionController::class )->except(['show']);
-   
-    
+    Route::resource('property', \App\Http\Controllers\Admin\PropertyController::class)->except(['show']);
+    Route::resource('option', \App\Http\Controllers\Admin\OptionController::class)->except(['show']);
+
+    Route::get('property/{propertyId}/upload', [PictureController::class, 'index'])->name('property.upload');
+    Route::post('property/{propertyId}/upload', [PictureController::class, 'store'])->name('property.upload.store');
+    Route::delete('property/image/{propertyImageId}', [PictureController::class, 'destroy'])->name('property.image.destroy');
 });

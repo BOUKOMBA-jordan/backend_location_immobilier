@@ -13,34 +13,39 @@ class PropertyController extends Controller
     public function index(SearchPropertiesRequest $request)
     {
         $query = Property::query()->orderBy('created_at', 'desc');
-        if ($price = $request->validated('price')) {
-            $query = $query->where('price', '<=', $price);
+        $validated = $request->validated();
+        
+        if (isset($validated['price'])) {
+            $query = $query->where('price', '<=', $validated['price']);
         }
         
-        if ($surface = $request->validated('surface')) {
-            $query = $query->where('surface', '>=', $surface);
+        if (isset($validated['surface'])) {
+            $query = $query->where('surface', '>=', $validated['surface']);
         }
         
-        if ($rooms = $request->validated('rooms')) {
-            $query = $query->where('rooms', '>=', $rooms);
+        if (isset($validated['rooms'])) {
+            $query = $query->where('rooms', '>=', $validated['rooms']);
         }
 
-        if ($title = $request->validated('title')) {
-            $query = $query->where('title', 'like', "%{$title}%");
+        if (isset($validated['title'])) {
+            $query = $query->where('title', 'like', "%{$validated['title']}%");
         }
-        
+
+       /* if (isset($validated['image'])) {
+            $query = $query->where('image', 'like', "%{$validated['image']}%");
+        }*/
         
         return view('property.index', [
             'properties' => $query->paginate(16),
-            'input' => $request->validated()
+            'input' => $validated
         ]);
     }
 
     public function show(string $slug, Property $property)
     {
         $expectedSlug = $property->getSlug();
-        if ($slug =! $expectedSlug) {
-            return to_route('property.show', ['slug' => $expectedSlug, 'property'=> $property]);
+        if ($slug !== $expectedSlug) {
+            return redirect()->route('property.show', ['slug' => $expectedSlug, 'property'=> $property]);
         }
         
         return view('property.show', [
@@ -51,6 +56,6 @@ class PropertyController extends Controller
     public function contact(Property $property, PropertyContactRequest $request) 
     {
         Mail::send(new PropertyContactMail($property, $request->validated()));
-        return back()->with('success', 'Votre demande de contact a bien été envoyé');
+        return back()->with('success', 'Votre demande de contact a bien été envoyée');
     }
 }

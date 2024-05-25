@@ -25,6 +25,7 @@ public function up()
         $table->string('address');
         $table->string('postal_code');
         $table->boolean('sold')->default(false);
+        $table->string('image');
         $table->timestamps();
     });
 }
